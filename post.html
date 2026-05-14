@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading… — Alex Tarasiuk</title>
+    <link rel="icon" href="assets/profile.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+</head>
+<body class="post-page">
+    <main class="page">
+        <nav class="post-nav">
+            <a href="index.html" class="back-link">← Alex Tarasiuk</a>
+        </nav>
+
+        <article id="article">
+            <p class="loading">Loading…</p>
+        </article>
+
+        <hr class="divider">
+
+        <nav class="post-nav post-nav-bottom">
+            <a href="index.html" class="back-link">← Back to home</a>
+        </nav>
+    </main>
+
+    <script>
+        (async function () {
+            const params = new URLSearchParams(location.search);
+            const slug = params.get('p');
+            const article = document.getElementById('article');
+            if (!slug) {
+                article.innerHTML = '<p>No post specified.</p>';
+                return;
+            }
+            const safeSlug = slug.replace(/[^a-zA-Z0-9_\-.]/g, '');
+            try {
+                const res = await fetch(`posts/${encodeURIComponent(safeSlug)}.md`);
+                if (!res.ok) throw new Error(`Could not load post (${res.status}).`);
+                const raw = await res.text();
+                const { frontmatter, body } = parseFrontmatter(raw);
+                const title = frontmatter.title || safeSlug;
+                document.title = `${title} — Alex Tarasiuk`;
+
+                marked.setOptions({ breaks: false, gfm: true });
+                const html = DOMPurify.sanitize(marked.parse(body), { ADD_ATTR: ['target', 'rel'] });
+
+                const date = frontmatter.date
+                    ? new Date(frontmatter.date + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                    : '';
+
+                article.innerHTML = `
+                    <header class="post-header">
+                        <h1 class="post-title">${escapeHtml(title)}</h1>
+                        ${date ? `<p class="post-date">${date}</p>` : ''}
+                    </header>
+                    <div class="post-body">${html}</div>
+                `;
+
+                article.querySelectorAll('a[href^="http"]').forEach(a => {
+                    a.target = '_blank';
+                    a.rel = 'noopener';
+                });
+            } catch (e) {
+                console.error(e);
+                article.innerHTML = `<p>Sorry, couldn't load that post.<br><small>${escapeHtml(e.message)}</small></p>`;
+            }
+        })();
+
+        function parseFrontmatter(src) {
+            const m = src.match(/^---\n([\s\S]*?)\n---\n?/);
+            if (!m) return { frontmatter: {}, body: src };
+            const fm = {};
+            m[1].split('\n').forEach(line => {
+                const idx = line.indexOf(':');
+                if (idx === -1) return;
+                const key = line.slice(0, idx).trim();
+                let value = line.slice(idx + 1).trim();
+                if (/^".*"$/.test(value) || /^'.*'$/.test(value)) {
+                    try { value = JSON.parse(value); } catch { value = value.slice(1, -1); }
+                }
+                fm[key] = value;
+            });
+            return { frontmatter: fm, body: src.slice(m[0].length) };
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+    </script>
+</body>
+</html>

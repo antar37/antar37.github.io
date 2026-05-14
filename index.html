@@ -3,10 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Alex Tarasiuk</title>
+    <meta name="description" content="Hi, I'm Alex. I live in Querétaro, Mexico. I make websites and other fun digital things.">
+    <meta property="og:title" content="Alex Tarasiuk">
+    <meta property="og:description" content="Hi, I'm Alex. I live in Querétaro, Mexico. I make websites and other fun digital things.">
+    <meta property="og:image" content="assets/cover.jpg">
+    <link rel="icon" href="assets/profile.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <h1>Alex</h1>
-    <p>This is my website. Here is where my stuff will live.</p>
+    <div class="cover">
+        <img src="assets/cover.jpg" alt="" loading="eager">
+    </div>
+
+    <main class="page page-full-width">
+        <div class="page-header">
+            <img class="page-icon-img" src="assets/profile.png" alt="Alex Tarasiuk">
+            <h1 class="page-title">Alex Tarasiuk</h1>
+        </div>
+
+        <p class="intro">Hi, I'm Alex.</p>
+
+        <div class="columns">
+            <div class="col col-left">
+                <div class="callout">
+                    <span class="callout-icon">🇲🇽</span>
+                    <span class="callout-body">I live in <a href="https://www.google.com/maps/place/Santiago+de+Quer%C3%A9taro,+Qro./@20.6122138,-100.4452366,13z/data=!3m1!4b1!4m5!3m4!1s0x85d35b8fdc5b9255:0x97b094aa561b832f!8m2!3d20.5887932!4d-100.3898881" target="_blank" rel="noopener">Querétaro</a>, Mexico. I make <a href="https://www.replicant.media/" target="_blank" rel="noopener">websites </a>and other fun digital things.</span>
+                </div>
+                <div class="callout">
+                    <span class="callout-icon">⛪</span>
+                    <span class="callout-body">I'm on the pastoral team of <a href="http://iglesiaconexionvertical.com" target="_blank" rel="noopener">Iglesia Conexión Vertical</a>.</span>
+                </div>
+                <div class="callout">
+                    <span class="callout-icon">🎙️</span>
+                    <span class="callout-body">We have a <a href="https://anchor.fm/entresemana" target="_blank" rel="noopener">podcast</a>.</span>
+                </div>
+                <div class="callout">
+                    <span class="callout-icon">🐦</span>
+                    <span class="callout-body">I <a href="https://twitter.com/antar37" target="_blank" rel="noopener">tweet</a> sometimes.</span>
+                </div>
+                <div class="callout">
+                    <span class="callout-icon">🌎</span>
+                    <span class="callout-body">I <a href="https://www.linkedin.com/in/alex-tarasiuk-63a87720/" target="_blank" rel="noopener">work</a> wherever.</span>
+                </div>
+                <div class="callout">
+                    <span class="callout-icon">📚</span>
+                    <span class="callout-body">I try to <a href="https://alextarasiuk.notion.site/1a1f3ec827b94b3a821a2b7e3beb5c36" target="_blank" rel="noopener">read</a> often.</span>
+                </div>
+            </div>
+
+            <div class="col col-right">
+                <figure class="image-block">
+                    <img src="assets/sierra-gorda.jpg" alt="Sierra Gorda de Querétaro">
+                    <figcaption>Sierra Gorda de Querétaro</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <section class="posts" id="posts">
+            <h2 class="section-title">Posts</h2>
+            <div class="posts-grid" id="posts-grid">
+                <!-- populated by JS from posts/index.json -->
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <a class="file" href="Alex_Tarasiuk_Resume.pdf" target="_blank" rel="noopener">
+            <span class="file-icon" aria-hidden="true">
+                <svg viewBox="0 0 30 36" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 0h17l7 7v27a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2z" fill="currentColor" opacity="0.06"/>
+                    <path d="M3 0h17l7 7v27a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-opacity="0.4" stroke-width="1"/>
+                    <path d="M20 0v7h7" fill="none" stroke="currentColor" stroke-opacity="0.4" stroke-width="1"/>
+                    <text x="15" y="26" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="6.5" font-weight="700" fill="#e03e3e">PDF</text>
+                </svg>
+            </span>
+            <span class="file-info">
+                <span class="file-name">Alex_Tarasiuk_Resume.pdf</span>
+                <span class="file-size">117.7KB</span>
+            </span>
+        </a>
+    </main>
+
+    <script>
+        (async function () {
+            try {
+                const res = await fetch('posts/index.json');
+                if (!res.ok) return;
+                const posts = await res.json();
+                const grid = document.getElementById('posts-grid');
+                grid.innerHTML = posts.map(p => {
+                    const date = p.published ? new Date(p.published + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+                    const slug = encodeURIComponent(p.file.replace(/\.md$/, ''));
+                    return `
+                        <a class="post-card" href="post.html?p=${slug}">
+                            <span class="post-card-icon">📄</span>
+                            <span class="post-card-title">${escapeHtml(p.title)}</span>
+                            ${date ? `<span class="post-card-date">${date}</span>` : ''}
+                            ${p.tldr ? `<span class="post-card-tldr">${escapeHtml(p.tldr)}</span>` : ''}
+                        </a>`;
+                }).join('');
+            } catch (e) {
+                console.warn('Could not load posts index:', e);
+            }
+        })();
+
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+    </script>
 </body>
 </html>
